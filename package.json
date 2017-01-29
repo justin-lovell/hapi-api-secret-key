@@ -1,0 +1,31 @@
+{
+  "name": "hapi-api-secret-key",
+  "version": "1.0.0",
+  "description": "Protect your API tagged routes with a simple set of known keys. Useful for locking down useage from API managers",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justin-lovell/hapi-api-secret-key.git"
+  },
+  "keywords": [
+    "hapi",
+    "api",
+    "apim"
+  ],
+  "author": "Justin Lovell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/justin-lovell/hapi-api-secret-key/issues"
+  },
+  "homepage": "https://github.com/justin-lovell/hapi-api-secret-key#readme",
+  "dependencies": {
+    "boom": "^4.2.0"
+  },
+  "devDependencies": {
+    "hapi": "latest",
+    "mocha": "latest"
+  }
+}
