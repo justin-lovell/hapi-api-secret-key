@@ -135,7 +135,7 @@ describe('protect-api', function () {
     var remoteServer = null;
     var localhostServer = null;
     var configOptions = {
-      secrets: ['secret']
+      secrets: ['secret', 'secret2']
     };
 
     before(function (done) {
@@ -176,7 +176,7 @@ describe('protect-api', function () {
       describe('when accessing from localhost', function () {
 
           it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 200', function () {
-              return localhostServer.inject(Object.assign(greetName, {headers: {'api-key': 'secret'}}))
+              return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'secret'}}))
                 .then(function (response) {
                   Assert.equal(response.statusCode, 200);
                   Assert.equal(response.result.name, 'name');
@@ -185,7 +185,7 @@ describe('protect-api', function () {
           );
 
           it('GET ' + greetName.url + '?api-key=secret | Respond pong:123 -> 200', function () {
-              return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=secret'}))
+              return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret'}))
                 .then(function (response) {
                   Assert.equal(response.statusCode, 200);
                   Assert.equal(response.result.name, 'name');
@@ -194,7 +194,7 @@ describe('protect-api', function () {
           );
 
           it('GET ' + greetName.url + '?api-key=secret2 | Respond pong:123 -> 200', function () {
-              return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=secret2'}))
+              return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret2'}))
                 .then(function (response) {
                   Assert.equal(response.statusCode, 200);
                   Assert.equal(response.result.name, 'name');
@@ -209,7 +209,7 @@ describe('protect-api', function () {
       describe('when accessing from remote server', function () {
 
         it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 200', function () {
-          return localhostServer.inject(Object.assign(greetName, {headers: {'api-key': 'secret'}}))
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'secret'}}))
             .then(function (response) {
               Assert.equal(response.statusCode, 200);
               Assert.equal(response.result.name, 'name');
@@ -217,7 +217,7 @@ describe('protect-api', function () {
         });
 
         it('GET ' + greetName.url + '?api-key=secret | Respond pong:123 -> 200', function () {
-          return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=secret'}))
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret'}))
             .then(function (response) {
               Assert.equal(response.statusCode, 200);
               Assert.equal(response.result.name, 'name');
@@ -225,7 +225,7 @@ describe('protect-api', function () {
         });
 
         it('GET ' + greetName.url + '?api-key=secret2 | Respond pong:123 -> 200', function () {
-          return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=secret2'}))
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret2'}))
             .then(function (response) {
                 Assert.equal(response.statusCode, 200);
                 Assert.equal(response.result.name, 'name');
@@ -243,7 +243,7 @@ describe('protect-api', function () {
       describe('when accessing from localhost', function () {
 
         it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 401', function () {
-          return localhostServer.inject(Object.assign(greetName, {headers: {'api-key': 'wrong'}}))
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'wrong'}}))
             .then(function (response) {
               Assert.equal(response.statusCode, 401);
               Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
@@ -251,7 +251,7 @@ describe('protect-api', function () {
         });
 
         it('GET ' + greetName.url + '?api-key=wrong | Respond pong:123 -> 401', function () {
-          return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=wrong'}))
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=wrong'}))
             .then(function (response) {
               Assert.equal(response.statusCode, 401);
               Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
@@ -264,7 +264,7 @@ describe('protect-api', function () {
       describe('when accessing from remote server', function () {
 
         it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 401', function () {
-          return localhostServer.inject(Object.assign(greetName, {headers: {'api-key': 'wrong'}}))
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'wrong'}}))
             .then(function (response) {
               Assert.equal(response.statusCode, 401);
               Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
@@ -272,7 +272,7 @@ describe('protect-api', function () {
         });
 
         it('GET ' + greetName.url + '?api-key=wrong | Respond pong:123 -> 401', function () {
-          return localhostServer.inject(Object.assign(greetName, {url: greetName.url + '?api-key=wrong'}))
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=wrong'}))
             .then(function (response) {
               Assert.equal(response.statusCode, 401);
               Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
