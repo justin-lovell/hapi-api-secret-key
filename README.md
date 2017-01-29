@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/justin-lovell/hapi-api-secret-key.svg?branch=master)](https://travis-ci.org/justin-lovell/hapi-api-secret-key)
+
 About
 =====
 The use case that this HAPI plugin solves is simple: given a simple set of API keys,
