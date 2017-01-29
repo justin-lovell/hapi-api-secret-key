@@ -1,6 +1,6 @@
 {
   "name": "hapi-api-secret-key",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Protect your API tagged routes with a simple set of known keys. Useful for locking down useage from API managers",
   "main": "index.js",
   "scripts": {
