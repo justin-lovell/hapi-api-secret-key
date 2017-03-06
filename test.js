@@ -107,7 +107,7 @@ describe('protect-api', function () {
 
     describe('when accessing from remote server', function () {
 
-      it('GET ' + greetName.url + ' | Respond pong:123 -> 401', function () {
+      it('GET ' + greetName.url + ' | Respond pong:123 -> 200', function () {
           return remoteServer.inject(ping123)
             .then(function (response) {
               Assert.equal(response.statusCode, 200);
@@ -158,6 +158,203 @@ describe('protect-api', function () {
     });
     after(function (done) {
       localhostServer.stop(done)
+    });
+
+
+    it('GET ' + greetName.url + '| Respond pong:123 -> 200', function () {
+        return remoteServer.inject(ping123)
+          .then(function (response) {
+            Assert.equal(response.statusCode, 200);
+            Assert.equal(response.result.pong, '123');
+          })
+      }
+    );
+
+
+    describe('requests are made with the correct token set', function () {
+
+      describe('when accessing from localhost', function () {
+
+          it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 200', function () {
+              return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'secret'}}))
+                .then(function (response) {
+                  Assert.equal(response.statusCode, 200);
+                  Assert.equal(response.result.name, 'name');
+                })
+            }
+          );
+
+          it('GET ' + greetName.url + '?api-key=secret | Respond pong:123 -> 200', function () {
+              return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret'}))
+                .then(function (response) {
+                  Assert.equal(response.statusCode, 200);
+                  Assert.equal(response.result.name, 'name');
+                });
+            }
+          );
+
+          it('GET ' + greetName.url + '?api-key=secret2 | Respond pong:123 -> 200', function () {
+              return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret2'}))
+                .then(function (response) {
+                  Assert.equal(response.statusCode, 200);
+                  Assert.equal(response.result.name, 'name');
+                });
+            }
+          );
+
+        }
+      );
+
+
+      describe('when accessing from remote server', function () {
+
+        it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 200', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'secret'}}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 200);
+              Assert.equal(response.result.name, 'name');
+            });
+        });
+
+        it('GET ' + greetName.url + '?api-key=secret | Respond pong:123 -> 200', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret'}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 200);
+              Assert.equal(response.result.name, 'name');
+            });
+        });
+
+        it('GET ' + greetName.url + '?api-key=secret2 | Respond pong:123 -> 200', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=secret2'}))
+            .then(function (response) {
+                Assert.equal(response.statusCode, 200);
+                Assert.equal(response.result.name, 'name');
+              }
+            );
+        });
+
+      });
+
+    });
+
+
+    describe('requests are made with the incorrect token set', function () {
+
+      describe('when accessing from localhost', function () {
+
+        it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 401', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'wrong'}}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+        it('GET ' + greetName.url + '?api-key=wrong | Respond pong:123 -> 401', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=wrong'}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+      });
+
+
+      describe('when accessing from remote server', function () {
+
+        it('GET ' + greetName.url + ' with HEADER | Respond pong:123 -> 401', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {headers: {'api-key': 'wrong'}}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+        it('GET ' + greetName.url + '?api-key=wrong | Respond pong:123 -> 401', function () {
+          return localhostServer.inject(Object.assign({}, greetName, {url: greetName.url + '?api-key=wrong'}))
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+      });
+
+    });
+
+
+    describe('requests are made without token set', function () {
+
+      describe('when accessing from localhost', function () {
+
+        it('GET ' + greetName.url + ' | Respond pong:123 -> 401', function () {
+          return localhostServer.inject(greetName)
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+      });
+
+
+      describe('when accessing from remote server', function () {
+
+
+        it('GET ' + greetName.url + ' | Respond pong:123 -> 401', function () {
+          return remoteServer.inject(greetName)
+            .then(function (response) {
+              Assert.equal(response.statusCode, 401);
+              Assert.equal(response.result.message, ProtectApiPlugin.messages.unauthorized);
+            })
+        });
+
+      });
+
+    });
+
+  });
+
+
+  describe('when the process environment variables are set', function () {
+
+    var remoteServer = null;
+    var localhostServer = null;
+
+    before(function () {
+        process.env['API_KEY_1'] = 'secret';
+        process.env['API_KEY_2'] = 'secret2';
+      }
+    );
+    before(function (done) {
+
+        remoteServer = new Hapi.Server();
+        remoteServer.connection({host: process.env.HOSTNAME});
+
+        startServer(remoteServer, {}, done);
+
+      }
+    );
+    before(function (done) {
+
+        localhostServer = new Hapi.Server();
+        localhostServer.connection({host: 'localhost'});
+
+        startServer(localhostServer, {}, done);
+
+      }
+    );
+
+    after(function (done) {
+
+      remoteServer.stop(done);
+
+    });
+    after(function (done) {
+
+      localhostServer.stop(done);
+
     });
 
 

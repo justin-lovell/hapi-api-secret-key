@@ -2,11 +2,23 @@
 
 var Boom = require('boom');
 
-
 const unauthorizedMessageText = 'The correct API Key was not provided by the client';
 
+
+function loadApiKeysFromEnvironmentVariables() {
+  var keys = [];
+
+  var curr;
+  while (curr = process.env['API_KEY_' + (keys.length + 1)]) {
+    keys.push(curr);
+  }
+
+  return keys;
+}
+
+
 function createInterceptor(options) {
-  var secrets = (options && options.secrets) || [];
+  var secrets = (options && options.secrets) || loadApiKeysFromEnvironmentVariables();
 
   return function (request, reply) {
     var tags = request.route.settings.tags;
@@ -39,7 +51,7 @@ const plugin = {
 
 plugin.register.attributes = {
   name: "hapi-api-secret-key",
-  version: '1.0.0'
+  version: '1.1.0'
 };
 
 module.exports = {
