@@ -23,14 +23,21 @@ function createFetchUserApiKey() {
   }
 }
 
+function createDefaultShouldApplyApiKeyFiltering() {
+  return function shouldApplyApiKeyFiltering(request) {
+    var tags = request.route.settings.tags;
+    return tags && tags.indexOf('api') >= 0;
+  }
+}
+
 
 function createInterceptor(options) {
   var secrets = (options && options.secrets) || loadApiKeysFromEnvironmentVariables();
   var fetchUserSuppliedSecret = options.fetchUserApiKey || createFetchUserApiKey();
+  var shouldApplyFilter = options.shouldApplyApiFilter || createDefaultShouldApplyApiKeyFiltering();
 
   return function (request, reply) {
-    var tags = request.route.settings.tags;
-    if (!tags || tags.indexOf('api') < 0) {
+    if (!shouldApplyFilter(request)) {
       return reply.continue();
     }
 
