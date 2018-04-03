@@ -4,7 +4,6 @@ var Boom = require('boom');
 
 const unauthorizedMessageText = 'The correct API Key was not provided by the client';
 
-
 function loadApiKeysFromEnvironmentVariables() {
   var keys = [];
 
@@ -36,37 +35,32 @@ function createInterceptor(options) {
   var fetchUserSuppliedSecret = options.fetchUserApiKey || createFetchUserApiKey();
   var shouldApplyFilter = options.shouldApplyApiFilter || createDefaultShouldApplyApiKeyFiltering();
 
-  return function (request, reply) {
+  return async (request, h) => {
     if (!shouldApplyFilter(request)) {
-      return reply.continue();
+      return h.continue;
     }
 
     var isLocalHost = request.info.hostname.toLowerCase() === 'localhost';
     if (isLocalHost && (!secrets || !secrets.length)) {
-      return reply.continue();
+      return h.continue;
     }
 
     var apiKey = fetchUserSuppliedSecret(request);
     if (secrets && secrets.indexOf(apiKey) >= 0) {
-      return reply.continue();
+      return h.continue;
     }
 
-    return reply(Boom.unauthorized(unauthorizedMessageText));
+    throw Boom.unauthorized(unauthorizedMessageText);
   }
 }
 
 
 const plugin = {
-  register: function (server, options, next) {
-
+  name: 'hapi-api-secret-key',
+  version: '2.0.0',
+  register(server, options) {
     server.ext('onPreAuth', createInterceptor(options));
-    next();
   }
-};
-
-plugin.register.attributes = {
-  name: "hapi-api-secret-key",
-  version: '1.1.0'
 };
 
 module.exports = {
